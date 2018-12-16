@@ -14,7 +14,7 @@ function NostalgyDebug(aText)
 {
   var csClass = Components.classes['@mozilla.org/consoleservice;1'];
   var cs = csClass.getService(Components.interfaces.nsIConsoleService);
-  cs.logStringMessage(aText);
+  cs.logStringMessage('*****************'+aText);
 }
 
 function NostalgyStopEvent(ev) {

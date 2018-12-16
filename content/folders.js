@@ -131,6 +131,9 @@ function NostalgyFolderMatch(f,reg) {
   }
 }
 
+
+
+
 function NostalgyGetAutoCompleteValuesFunction(box) {
   return function NostalgyGetAutoCompleteValues(text) {
     var values = [];
@@ -150,33 +153,33 @@ function NostalgyGetAutoCompleteValuesFunction(box) {
         try { predictedFolders = NostalgyPredict.predict_folder(nostalgy_recent_folders_max_size); }
         catch (ex) { }
         if( predictedFolders != null && predictedFolders.length > 0 )
-	  for (var j = 0; j < predictedFolders.length; j++)
-	    if (added_count < nostalgy_recent_folders_max_size) {
-	      f(predictedFolders[j]);
-	      added_count++;
-            }
+         for (var j = 0; j < predictedFolders.length; j++)
+           if (added_count < nostalgy_recent_folders_max_size) {
+             f(predictedFolders[j]);
+             added_count++;
+           }
       }
       for (var j = 0; j < nostalgy_recent_folders.length; j++) {
-	var found=0;
-	if (nostalgy_completion_options.use_statistical_prediction &&
+           var found=0;
+           if (nostalgy_completion_options.use_statistical_prediction &&
             predictedFolders != null && predictedFolders.length > 0)
-	  for (var i=0; i < predictedFolders.length; i++)
-	    if (NostalgyFolderName(predictedFolders[i]) == nostalgy_recent_folders[j] )
-	      found=1;
-	if ( found==0 && added_count < nostalgy_recent_folders_max_size ) {
-	  add_folder(nostalgy_recent_folders[j]);
-	  added_count++;
-	}
+             for (var i=0; i < predictedFolders.length; i++)
+               if (NostalgyFolderName(predictedFolders[i]) == nostalgy_recent_folders[j] )
+                 found=1;
+               if ( found==0 && added_count < nostalgy_recent_folders_max_size ) {
+                 add_folder(nostalgy_recent_folders[j]);
+                 added_count++;
+               }
       }
     } else {
-      nostalgy_search_folder_options.do_tags =
-        nostalgy_completion_options.always_include_tags ||
-        (text.substr(0,1) == ":");
-      NostalgyIterateMatches(text, box.shell_completion, f);
-      if (nb == 0 && !nostalgy_search_folder_options.do_tags) {
-        nostalgy_search_folder_options.do_tags = true;
-        NostalgyIterateMatches(text, box.shell_completion, f);
-      }
+            nostalgy_search_folder_options.do_tags =
+            nostalgy_completion_options.always_include_tags ||
+            (text.substr(0,1) == ":");
+            NostalgyIterateMatches(text, box.shell_completion, f);
+            if (nb == 0 && !nostalgy_search_folder_options.do_tags) {
+              nostalgy_search_folder_options.do_tags = true;
+              NostalgyIterateMatches(text, box.shell_completion, f);
+            }
     }
 
     /* For unknown reason, the popup is left closed (even though box.popupOpen = true)
@@ -184,19 +187,47 @@ function NostalgyGetAutoCompleteValuesFunction(box) {
      * cancelled with Escape.  We thus force the popup to be opened some time after
      * the completion is done.
      */
-    if (box.popup.state == "closed" && nb != 0)
-      setTimeout(function() {
-                   if (box.popup.state == "closed") {
-                     NostalgyDebug("Forcing popup to be opened");
-                     var width = box.getBoundingClientRect().width;
-                     box.popup.setAttribute("width", width > 100 ? width : 100);
-                     box.popup.openPopup(box, "before_start", 0, 0, false, false);
-                   } }, 50);
+function mydump(arr,level) {
+    var dumped_text = "";
+    if(!level) level = 0;
+    if (5==level) return "";
 
+    var level_padding = "";
+    for(var j=0;j<level+1;j++) level_padding += "    ";
+
+    if(typeof(arr) == 'object') {  
+        for(var item in arr) {
+            var value = arr[item];
+
+            if(typeof(value) == 'object') { 
+                dumped_text += level_padding + "'" + item + "' ...\n";
+                dumped_text += mydump(value,level+1);
+            } else {
+                dumped_text += level_padding + "'" + item + "' => \"" + value + "\"\n";
+            }
+        }
+    } else { 
+        dumped_text = "===>"+arr+"<===("+typeof(arr)+")";
+    }
+    return dumped_text;
+}
+    console.log(box);
+//    NostalgyDebug(mydump(box,0));
+     NostalgyDebug('nb:'+nb);
+     if (box.popup.state == "closed" && nb != 0)
+      setTimeout(function() {
+       if (box.popup.state == "closed") {
+         NostalgyDebug("Forcing popup to be opened");
+         var width = box.getBoundingClientRect().width;
+         var height = box.getBoundingClientRect().height;
+         box.popup.setAttribute("width", width > 100 ? width : 100);
+         box.popup.setAttribute("height", height > 100 ? height : 100);
+         box.popup.openPopup(box, "before_start", 0, 0, false, false);
+       } }, 550);
+NostalgyDebug(values);
     return values;
   };
 }
-
 
 function NostalgyAutocompleteComponent() {
   var nac =
@@ -208,6 +239,7 @@ function NostalgyAutocompleteComponent() {
 }
 
 function NostalgyFolderSelectionBox(box) {
+  NostalgyDebug('NostalgyFolderSelectionBox');
   var cmd = box.getAttribute("nostalgyfolderbox");
   if (cmd) {
     box.setAttribute("ontextentered",cmd);

@@ -11,6 +11,7 @@ var nostalgy_timeout_regkey = 0;
 var nostalgy_on_move_completed = null;
 var nostalgy_selection_saved = null;
 
+
 function NostalgyIsDefined(s) {
     return (typeof(window[s]) != "undefined");
 }
@@ -297,7 +298,9 @@ function NostalgyCollapseFolderPane() {
 
 
 function NostalgyCmd(lab,cmd,require_file) {
- nostalgy_focus_saved = document.commandDispatcher.focusedElement;
+ //nostalgy_focus_saved = document.commandDispatcher.focusedElement;
+ console.log(document.commandDispatcher.focusedElement);
+ if (!nostalgy_focus_saved) { nostalgy_focus_saved = NostalgyEBI("threadTree"); }
  if (!nostalgy_focus_saved) { nostalgy_focus_saved = NostalgyEBI("messagepane").contentWindow; }
 
  nostalgy_search_folder_options.require_file = require_file;
@@ -316,7 +319,7 @@ function NostalgyCmd(lab,cmd,require_file) {
    nostalgy_folderBox.focus();
 
    // Force search on the empty string (-> recent folders)
-   NostalgyShowRecentFoldersList();
+//   NostalgyShowRecentFoldersList();
  }, 0);
  return true;
 }
@@ -324,8 +327,12 @@ function NostalgyCmd(lab,cmd,require_file) {
 function NostalgyShowRecentFoldersList() {
   var listener = null;
   var box = nostalgy_folderBox;
-  if (box.controller) // Toolkit
+  NostalgyDebug('axaxa');
+  if (box.controller) {// Toolkit
     listener = box.controller.QueryInterface(Components.interfaces.nsIAutoCompleteObserver);
+    NostalgyDebug('bbb');
+    console.log(listener)
+  }
   else { // XPFE
     // box.mAutoCompleteObserver uses a flawed equality check so we have to replace it.
     // Since we only use one autocompleter, its name is equal to the autocompletesearch attribute.
@@ -334,11 +341,13 @@ function NostalgyShowRecentFoldersList() {
         box.processResults(box.getAttribute("autocompletesearch"), aResult);
       }
     };
+    NostalgyDebug('ccc');
     // Reset internal state
     box.currentSearchString = "";
   }
 
-  NostalgyAutocompleteComponent().startSearch("", box.searchParam, null, listener);
+  var nac = NostalgyAutocompleteComponent().startSearch("", box.searchParam, null, listener);
+
 }
 
 function NostalgyCreateTag(name) {

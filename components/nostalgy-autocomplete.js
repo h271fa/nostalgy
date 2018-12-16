@@ -15,10 +15,11 @@ function NostalgyDebug(aText)
 {
   var csClass = Components.classes['@mozilla.org/consoleservice;1'];
   var cs = csClass.getService(Components.interfaces.nsIConsoleService);
-  cs.logStringMessage(aText);
+  cs.logStringMessage('******'+aText);
 }
 
 function NostalgyAutoCompleteResult(searchString, results) {
+  NostalgyDebug('NostalgyAutoCompleteResult');
   const ACR = Ci.nsIAutoCompleteResult;
   this._searchResult = results.length > 0 ? ACR.RESULT_SUCCESS : ACR.NOMATCH;
   this._searchString = searchString;
@@ -48,6 +49,7 @@ NostalgyAutoCompleteResult.prototype = {
 // nsIAutoCompleteSearch implementation
 
 function NostalgyAutoCompleteSearch() {
+  NostalgyDebug('NostalgyAutoCompleteSearch');
   this.wrappedJSObject = this;
 }
 
@@ -61,12 +63,17 @@ NostalgyAutoCompleteSearch.prototype = {
   attachGetValuesFunction: function(f) { this._id++; this._f[this._id] = f; return this._id; },
 
   startSearch: function(searchString, searchParam, previousResult, listener) {
+    NostalgyDebug('startSearch');
     var searchResults = this._f[searchParam](searchString);
     var result = new NostalgyAutoCompleteResult(searchString, searchResults);
+
     listener.onSearchResult(this, result);
   },
 
-  stopSearch: function() {},
+  stopSearch: function() {
+    NostalgyDebug('stopSearch');
+   
+  },
 
   QueryInterface: XPCOMUtils.generateQI([ Ci.nsIAutoCompleteSearch ])
 };
